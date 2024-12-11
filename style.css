@@ -1,0 +1,243 @@
+*,
+*::after,
+*::before {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans',
+    'Helvetica Neue';
+}
+
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+:root {
+  --excel-color: #33c481;
+  --primary-color: #33c48144;
+  --secondary-color: #33c48144;
+}
+html {
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: white transparent;
+}
+
+body {
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  place-content: center;
+  gap: 1rem;
+  background-image: repeating-conic-gradient(
+      from var(--deg) at 20% 20%,
+      var(--primary-color) 0 1deg,
+      transparent 2deg 3deg
+    ),
+    repeating-conic-gradient(
+      from var(--deg) at 50% 20%,
+      var(--secondary-color) 0 1deg,
+      transparent 2deg 3deg
+    ),
+    repeating-conic-gradient(
+      from var(--deg) at 70% 20%,
+      var(--secondary-color) 0 1deg,
+      transparent 2deg 3deg
+    ),
+    repeating-conic-gradient(
+      from var(--deg) at 20% 50%,
+      var(--secondary-color) 0 1deg,
+      transparent 2deg 3deg
+    ),
+    repeating-conic-gradient(
+      from var(--deg) at 50% 50%,
+      var(--secondary-color) 0 1deg,
+      transparent 2deg 3deg
+    ),
+    repeating-conic-gradient(
+      from var(--deg) at 70% 50%,
+      var(--secondary-color) 0 1deg,
+      transparent 2deg 3deg
+    ),
+    repeating-conic-gradient(
+      from var(--deg) at 20% 70%,
+      var(--secondary-color) 0 1deg,
+      transparent 2deg 3deg
+    ),
+    repeating-conic-gradient(
+      from var(--deg) at 50% 70%,
+      var(--secondary-color) 0 1deg,
+      transparent 2deg 3deg
+    ),
+    repeating-conic-gradient(
+      from var(--deg) at 70% 70%,
+      var(--secondary-color) 0 1deg,
+      transparent 2deg 3deg
+    );
+  animation: rotar 120s linear infinite alternate both;
+}
+
+.barra-formula {
+  padding: 0.2rem;
+  border: none;
+  outline: none;
+
+  @media (width <= 1000px) {
+    display: none;
+  }
+}
+
+.container-excel {
+  width: 420px;
+  min-height: 280px;
+  background-color: #fff;
+
+  @media (width <= 1000px) {
+    display: none;
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    height: 100%;
+    --gray-th-fist: #ddd;
+
+    .thead {
+      background-color: var(--gray-th-fist);
+    }
+
+    .th-top {
+      img {
+        width: 14px;
+      }
+    }
+
+    th,
+    td {
+      border: 1px solid #808080aa;
+      padding: 0.2rem 0.8rem;
+      text-align: center;
+      font-size: 0.8rem;
+      position: relative;
+      cursor: cell;
+
+      span,
+      input {
+        overflow: hidden;
+        text-wrap: nowrap;
+      }
+
+      input {
+        border: none;
+        outline: none;
+        pointer-events: none;
+        opacity: 0;
+
+        &::selection {
+          background-color: transparent;
+        }
+
+        &.click {
+          caret-color: transparent;
+          color: transparent;
+        }
+
+        &.dbclick {
+          caret-color: black;
+          color: black;
+
+          & + span {
+            opacity: 0;
+            pointer-events: none;
+          }
+        }
+
+        &.seleccionado,
+        &:focus {
+          outline: 1.5px solid var(--excel-color);
+          opacity: 1;
+
+          & ~ span .joystick {
+            opacity: 1;
+          }
+
+          & ~ span .joystick.joystickOpaco {
+            opacity: 0;
+          }
+        }
+
+        &.selectBg {
+          background-color: #80808018;
+          color: transparent;
+        }
+      }
+
+      input,
+      span {
+        left: 0;
+        top: 0;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        padding-inline: 0.2rem;
+        align-content: center;
+      }
+
+      span {
+        user-select: none;
+
+        .joystick {
+          position: absolute;
+          display: block;
+          bottom: 0px;
+          right: 0px;
+          outline: none;
+          background-color: #33c481;
+          width: 3px;
+          height: 3px;
+          opacity: 0;
+          cursor: crosshair;
+        }
+      }
+    }
+
+    th {
+      &.selected {
+        background-color: #b8b8b8;
+      }
+    }
+    td {
+      &.selected {
+        background-color: #33c48144;
+      }
+    }
+
+    tbody {
+      tr td:first-child {
+        font-weight: 650;
+        background-color: var(--gray-th-fist);
+
+        &.selected {
+          background-color: #b8b8b8;
+        }
+      }
+    }
+  }
+}
+
+@keyframes rotar {
+  0% {
+    --deg: 0deg;
+  }
+  100% {
+    --deg: 360deg;
+  }
+}
+
+@property --deg {
+  syntax: '<angle>';
+  inherits: true;
+  initial-value: 0deg;
+}
