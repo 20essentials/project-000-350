@@ -79,7 +79,10 @@ body {
       var(--secondary-color) 0 1deg,
       transparent 2deg 3deg
     );
-  animation: rotar 120s linear infinite alternate both;
+
+  @media (hover: hover) {
+    animation: rotar 120s linear infinite alternate both;
+  }
 }
 
 .barra-formula {
