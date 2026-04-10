@@ -30,7 +30,7 @@ body {
   flex-direction: column;
   flex-wrap: wrap;
   place-content: center;
-  gap: 1rem;
+  gap: 0.8vmax;
   background-image: repeating-conic-gradient(
       from var(--deg) at 20% 20%,
       var(--primary-color) 0 1deg,
@@ -84,7 +84,7 @@ body {
   border: none;
   outline: none;
 
-  @media (width <= 1000px) {
+  @media (width <= 1111px) {
     display: none;
   }
 }
@@ -94,8 +94,8 @@ body {
   min-height: 280px;
   background-color: #fff;
 
-  @media (width <= 1000px) {
-    display: none;
+  @media (width <= 1111px) {
+    transform: scale(0.8);
   }
 
   table {
