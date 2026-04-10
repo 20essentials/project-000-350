@@ -148,9 +148,8 @@ class ExcelTable {
       if (e.target.matches('th.thead')) {
         const thCurrent = e.target;
         const indexColumn =
-          [...thCurrent.parentElement.querySelectorAll('th')].indexOf(
-            thCurrent
-          ) + 1;
+          [...thCurrent.parentElement.querySelectorAll('th')].indexOf(thCurrent) +
+          1;
 
         selectedColumn = indexColumn - 2;
 
@@ -203,13 +202,9 @@ class ExcelTable {
             ];
             for (let x = Number(firstX) + 1; x <= Number(newX) + 1; x++) {
               if (currentROW[x] === tdPadre) continue;
-              currentROW[x]
-                .querySelector('input')
-                .classList.add('seleccionado');
+              currentROW[x].querySelector('input').classList.add('seleccionado');
               currentROW[x].querySelector('input').classList.add('selectBg');
-              currentROW[x]
-                .querySelector('aside')
-                .classList.add('joystickOpaco');
+              currentROW[x].querySelector('aside').classList.add('joystickOpaco');
             }
           }
         }
