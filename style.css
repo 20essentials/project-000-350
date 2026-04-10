@@ -100,6 +100,9 @@ body {
   @media (width <= 1111px) {
     transform: scale(0.8);
   }
+  @media (width <= 1111px) and (orientation: portrait) {
+    transform: scale(0.65);
+  }
 
   table {
     border-collapse: collapse;
