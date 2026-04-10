@@ -6,6 +6,7 @@
   padding: 0;
   font-family: Arial, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans',
     'Helvetica Neue';
+  -webkit-tap-highlight-color: transparent;
 }
 
 a {
@@ -17,6 +18,7 @@ a {
   --primary-color: #33c48144;
   --secondary-color: #33c48144;
 }
+
 html {
   scroll-behavior: smooth;
   scrollbar-width: thin;
@@ -30,6 +32,7 @@ body {
   flex-direction: column;
   flex-wrap: wrap;
   place-content: center;
+  touch-action: pan-y;
   gap: 0.8vmax;
   background-image: repeating-conic-gradient(
       from var(--deg) at 20% 20%,

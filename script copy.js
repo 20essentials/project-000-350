@@ -11,7 +11,7 @@ let selectedRow = null;
 class ExcelTable {
   numberOfRows = 10;
   numberOfCols = 6;
-  START_CHAR = 65;
+  START_CHAR = 65; //A
   INITIAL_EXCEL_CELLS = {
     0: '=Math.PI',
     1: '=Math.E',
@@ -82,6 +82,7 @@ class ExcelTable {
 
   selectedCellsClean() {
     $$('.selected').forEach(th => th.classList.remove('selected'));
+
     $$('input.seleccionado').forEach(input =>
       input.classList.remove('seleccionado')
     );
@@ -92,7 +93,8 @@ class ExcelTable {
   initEvents() {
     function handleKeyDown(input) {
       input.addEventListener('keydown', e => {
-        if (e.key === 'Enter') {
+        const { key } = e;
+        if (key === 'Enter') {
           e.preventDefault();
           input.blur();
         }
@@ -101,6 +103,8 @@ class ExcelTable {
 
     document.addEventListener('dblclick', e => {
       if (e.target.matches('.celda-excel')) {
+        let celdaSpan = e.target;
+        let tdPadre = celdaSpan.closest('td');
         let input = e.target.previousElementSibling;
         input.focus();
         input.className = '';
@@ -108,13 +112,15 @@ class ExcelTable {
         input.maxLength = 1000;
         const end = input.value.length;
         input.setSelectionRange(end, end);
+
         handleKeyDown(input);
       }
     });
 
     document.addEventListener('click', e => {
       if (e.target.matches('.celda-excel')) {
-        let tdPadre = e.target.closest('td');
+        let celdaSpan = e.target;
+        let tdPadre = celdaSpan.closest('td');
         let input = e.target.previousElementSibling;
         input.className = '';
         input.classList.add('click');
@@ -125,9 +131,9 @@ class ExcelTable {
 
         input.addEventListener(
           'blur',
-          () => {
+          e => {
             input.className = 'click seleccionado';
-            const { x, y } = tdPadre.dataset;
+            const { x, y, column, row } = tdPadre.dataset;
             if (this.STATE[x][y].value === input.value) return;
             this.updateCell(x, y, input.value);
             $barraFormula.value = '';
@@ -153,6 +159,7 @@ class ExcelTable {
         $$(`tr td:nth-child(${indexColumn})`).forEach(td =>
           td.classList.add('selected')
         );
+
         return;
       }
 
@@ -165,31 +172,30 @@ class ExcelTable {
         $$(`tr:nth-child(${indexRow}) td`).forEach(th =>
           th.classList.add('selected')
         );
+
         return;
       }
     });
 
-    document.addEventListener('pointerdown', e => {
-      if (e.target.matches('.joystick')) {
+    document.addEventListener('mousedown', e => {
+      if (e.target.matches('.joystick') && e.button === 0) {
         e.preventDefault();
         let tdPadre = e.target.closest('td');
         if (!tdPadre) return;
-
         let { x: firstY, y: firstX } = tdPadre.dataset;
         let inputScope = tdPadre.querySelector('input');
         inputScope.classList.add('seleccionado');
 
-        const handleMove = e => {
-          const currentElement = document.elementFromPoint(
-            e.clientX,
-            e.clientY
-          );
-          let td = currentElement?.closest('td');
+        $tbody.addEventListener('mousemove', handleMove);
+
+        function handleMove(e) {
+          const x = e.clientX;
+          const y = e.clientY;
+          const currentElement = document.elementFromPoint(x, y);
+          let td = currentElement.closest('td');
           if (!td || td.classList.contains('column-0')) return;
           if (td === tdPadre) return;
-
           let { x: newY, y: newX } = td.dataset;
-
           for (let y = Number(firstY); y <= Number(newY); y++) {
             let currentROW = [
               ...[...$tbody.querySelectorAll('tr')][y].querySelectorAll('td')
@@ -198,25 +204,22 @@ class ExcelTable {
               if (currentROW[x] === tdPadre) continue;
               currentROW[x].querySelector('input').classList.add('seleccionado');
               currentROW[x].querySelector('input').classList.add('selectBg');
-              currentROW[x]
-                .querySelector('aside')
-                .classList.add('joystickOpaco');
+              currentROW[x].querySelector('aside').classList.add('joystickOpaco');
             }
           }
-        };
+        }
 
-        const stopMove = () => {
-          document.removeEventListener('pointermove', handleMove);
-          document.removeEventListener('pointerup', stopMove);
-        };
+        $tbody.addEventListener('mousemove', handleMove);
 
-        document.addEventListener('pointermove', handleMove);
-        document.addEventListener('pointerup', stopMove);
+        $tbody.addEventListener('mouseup', e => {
+          $tbody.removeEventListener('mousemove', handleMove);
+        });
       }
     });
 
     document.addEventListener('keydown', e => {
-      if (e.key === 'Delete' && selectedColumn !== null) {
+      const { key } = e;
+      if (key === 'Delete' && selectedColumn !== null) {
         times(this.numberOfRows).forEach(row => {
           this.updateCell(row, selectedColumn, '');
         });
@@ -226,8 +229,7 @@ class ExcelTable {
         this.drawTbody();
         return;
       }
-
-      if (e.key === 'Delete' && selectedRow !== null) {
+      if (key === 'Delete' && selectedRow !== null) {
         times(this.numberOfCols).forEach(col => {
           this.updateCell(selectedRow, col, '');
         });
@@ -237,8 +239,7 @@ class ExcelTable {
         this.drawTbody();
         return;
       }
-
-      if (e.key === 'Tab') {
+      if (key === 'Tab') {
         e.preventDefault();
       }
     });
@@ -253,7 +254,6 @@ class ExcelTable {
         e.preventDefault();
         selectedColumn = null;
       }
-
       if (selectedRow !== null) {
         let columnValues = times(this.numberOfCols).map(
           col => this.STATE[selectedRow][col].computedValue
@@ -277,8 +277,8 @@ class ExcelTable {
 
   generateCellConstants(state) {
     return state
-      .map((row, col) =>
-        row
+      .map((row, col) => {
+        return row
           .map((cell, y) => {
             const letter = this.getCharacter(y);
             const cellId = `${letter}${col + 1}`;
@@ -290,17 +290,18 @@ class ExcelTable {
                 : `"${cell.computedValue}"`;
             return `const ${cellId} = ${valorVariable}; `;
           })
-          .join('\n')
-      )
+          .join('\n');
+      })
       .join('\n');
   }
 
   drawTh() {
-    let contentTh = `<tr><th class="th-top"><img src="assets/excelSvg.svg"></th>`;
+    let contentTh = `<tr><th class="th-top"><img src="assets/excelSvg.svg" alt="Excel Svg"></th>`;
     times(this.numberOfCols).forEach(col => {
       contentTh += `<th class="thead">${this.getCharacter(col)}</th>`;
     });
     contentTh += '</tr>';
+
     $th.innerHTML = contentTh;
   }
 
@@ -319,6 +320,7 @@ class ExcelTable {
           <span class="celda-excel">${
             this.STATE[row][col].computedValue
           }<aside class="joystick"></aside></span>
+          
         </td>`;
       });
       contentTBody += '</tr>';
